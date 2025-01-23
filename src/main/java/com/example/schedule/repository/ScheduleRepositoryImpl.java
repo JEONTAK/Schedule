@@ -115,7 +115,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                         rs.getTimestamp("edit_date").toLocalDateTime()
                 );
             }
-
         };
     }
 
@@ -132,7 +131,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                         rs.getTimestamp("edit_date").toLocalDateTime()
                 );
             }
-
         };
     }
 }
