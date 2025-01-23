@@ -30,13 +30,13 @@
 
 #### API 명세서
 
-|    기능     | HTTP Method |               URL                |                          request                           |       Response       | HTTP Status |
-|:---------:|:-----------:|:--------------------------------:|:----------------------------------------------------------:|:--------------------:|:-----------:|
-| 일정 생성(등록) |  **POST**   |           `/schedules`           |      request body를 통해 할일, 작성자명, 비밀번호를 담아 보내 일정 등록 요청.      |  등록 정보 JSON 데이터 반환   |  `200 OK`   |
-| 전체 일정 조회  |   **GET**   | `/schedules?name={}&editDate={}` |           조건에 맞는 모든 일정을 조회.(조건 미존재 시, 전체 일정 조회)            | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
-| 특정 일정 조회  |   **GET**   |    `/schedules/{scheduleId}`     |             query parameter로 ID 지정 후 선택 일정 조회.             | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
-| 특정 일정 수정  |   **PUT**   |    `/schedules/{scheduleId}`     | query parameter로 ID를 지정하고 request body에 데이터를 담아 기존 데이터 수정. |  수정 정보 JSON 데이터 반환   |  `200 OK`   |
-| 특정 일정 삭제  | **DELETE**  |    `/schedules/{scheduleId}`     |             query parameter로 ID 지정 후 선택 일정 삭제.             |       응답 코드 반환       |  `200 OK`   |
+|    기능     | HTTP Method |                      URL                       |                          request                           |       Response       | HTTP Status |
+|:---------:|:-----------:|:----------------------------------------------:|:----------------------------------------------------------:|:--------------------:|:-----------:|
+| 일정 생성(등록) |  **POST**   |                  `/schedules`                  |      request body를 통해 할일, 작성자명, 비밀번호를 담아 보내 일정 등록 요청.      |  등록 정보 JSON 데이터 반환   |  `200 OK`   |
+| 전체 일정 조회  |   **GET**   | `/schedules?name={name}&edit_date={edit_date}` |           조건에 맞는 모든 일정을 조회.(조건 미존재 시, 전체 일정 조회)            | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
+| 특정 일정 조회  |   **GET**   |           `/schedules/{schedule_id}`           |             query parameter로 ID 지정 후 선택 일정 조회.             | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
+| 특정 일정 수정  |   **PUT**   |           `/schedules/{schedule_id}`           | query parameter로 ID를 지정하고 request body에 데이터를 담아 기존 데이터 수정. |  수정 정보 JSON 데이터 반환   |  `200 OK`   |
+| 특정 일정 삭제  | **DELETE**  |           `/schedules/{schedule_id}`           |             query parameter로 ID 지정 후 선택 일정 삭제.             |       응답 코드 반환       |  `200 OK`   |
 
 #### ERD 작성
 
@@ -127,6 +127,62 @@ CREATE TABLE schedule
             - 특정 조건에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
         - [X] 특정 일정 조회 메서드
             - 특정 id에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
+
+___
+
+## Lv 2. 일정 수정 및 삭제
+
+### Requirement
+
+- 선택한 일정 수정
+    - 선택한 일정 내용 중 할일, 작성자명 만 수정 가능
+        - 서버에 일정 수정을 요청할 때 비밀번호를 함께 전달 (작성한 사용자가 맞는지 검증)
+        - 작성일은 변경할 수 없고, 수정일은 수정 완료 시, 수정한 시점으로 변경
+
+- 선택한 일정 삭제
+    - 서버에 일정 삭제를 요청할 때 비밀번호를 함께 전달 (작성한 사용자가 맞는지 검증)
+
+#### Configuration
+
+- [ ] 일정 Controller
+    - [ ] 일정 수정 메서드
+        - PutMapping 사용
+        - PathVariable 통해 id값 가져옴
+        - RequestBody 로 데이터를 가져옴
+        - 일정 Service 통해 id값에 맞는 일정 수정 후 return
+    - [ ] 일정 삭제 메서드
+        - DeleteMapping 사용
+        - PathVariable 통해 id값 가져옴
+        - RequestBody 로 데이터를 가져옴
+        - 일정 Service 통해 id값에 맞는 일정 삭제 후 return
+
+- [ ] 일정 Service
+    - [ ] 일정 ServiceImpl
+        - [ ] 일정 수정 메서드
+            - 만약 할일, 작성자명이 비어있다면
+                - 예외 처리 : BAD_REQUEST
+            - 만약 id에 해당하는 일정이 존재하지 않는다면
+                - 예외 처리 : NOT_FOUND
+            - 만약 해당하는 일정의 비밀번호와 들어온 비밀번호가 다르다면
+                - 예외 처리 : Unauthorized
+            - 들어온 데이터를 사용해 일정 Repository에 일정 수정 요청 후 반환 값 return
+        - [ ] 일정 삭제 메서드
+            - 만약 id에 해당하는 일정이 존재하지 않는다면
+                - 예외 처리 : NOT_FOUND
+            - 만약 해당하는 일정의 비밀번호와 들어온 비밀번호가 다르다면
+                - 예외 처리 : Unauthorized
+            - 들어온 데이터를 사용해 일정 Repository에 일정 삭제 요청 후 반환 값 return
+
+
+- [ ] 일정 Repository
+    - [ ] 일정 RepositoryImpl
+        - [ ] 일정 수정 메서드
+            - JDBC 테이블 및 컬럼 설정
+            - 파라미터를 들어온 값을 사용해 설정
+            - JDBC에 저장한 이후 Key 값을 받음
+            - Key값 과 들어온 데이터를 반환
+        - [ ] 일정 삭제 메서드
+            - 특정 조건에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
 
 ___
 
