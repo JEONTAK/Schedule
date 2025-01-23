@@ -24,8 +24,8 @@
     - [X] id : 일정 아이디 / BIGINT / (PK)
     - [X] name : 일정 작성자 / VARCHAR(30)
     - [X] password : 비밀번호 / VARCHAR(20)
-    - [X] createDate : 작성일 / TIMESTAMP
-    - [X] editDate : 수정일 / TIMESTAMP
+    - [X] create_date : 작성일 / TIMESTAMP
+    - [X] edit_date : 수정일 / TIMESTAMP
 - [X] SQL 작성
 
 #### API 명세서
@@ -47,6 +47,7 @@
 CREATE TABLE schedule
 (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '일정 식별자',
+    todo TEXT COMMENT '할 일',
     name VARCHAR(30) COMMENT '작성자',
     password VARCHAR(20) COMMENT '비밀 번호',
     createDate TIMESTAMP COMMENT '작성일',
@@ -54,7 +55,77 @@ CREATE TABLE schedule
 );
 ```
 ---
+## Lv 1. 일정 생성 및 조회
 
+### Requirement
+
+- 일정 생성
+  - 할일, 작성자명, 비밀번호, 작성/수정일을 저장
+  - 작성/수정일은 날짜와 시간을 모두 포함한 형태
+  - 각 일정의 고유 식별자(ID)를 자동으로 생성하여 관리
+  - 최초 입력시, 수정일과 작성일은 동일
+- 전체 일정 조회
+  - 다음 조건을 바탕으로 등록된 일정 목록을 전부 조회
+    - 수정일(형식 : YYYY-MM-DD)
+    - 작성자명
+  - 조건 중 한 가지만 충족하거나, 둘다 충족을 하지 않을 수도, 두 가지를 모두 충족할 수도 있음.
+  - 수정일 기준 내림차순으로 정렬하여 조회
+- 선택 일정 조회
+  - 선택한 일정 단건의 정보를 조회
+  - ID를 사용하여 조회
+
+#### Definition
+
+- [ ] 일정 Entity
+  - [ ] 필드
+    - id
+    - 할일
+    - 작성자명
+    - 비밀번호
+    - 작성/수정일
+
+- [ ] 일정 Controller
+  - [ ] 일정 생성 메서드
+    - PostMapping 사용
+    - RequestBody 로 데이터를 가져옴
+    - 일정 Service 통해 일정 저장 후 return
+  - [ ] 전체 일정 조회 메서드
+    - GetMapping 사용
+    - RequestParam을 통해 수정일, 작성자명 데이터를 가져옴
+    - 일정 Service 통해 조건에 맞는 일정을 List로 가져와 return
+  - [ ] 특정 일정 조회 메서드
+    - GetMapping 사용
+    - PathVariable통해 id 값 가져옴
+    - 일정 Service 통해 id값에 맞는 일정 가져와 return
+
+- [ ] 일정 RequestDto
+  - id 제외 데이터 사용
+- [ ] 일정 ResponseDto
+  - 전체 데이터 사용
+
+- [ ] 일정 Service
+  - [ ] 일정 ServiceImpl
+    - [ ] 일정 저장 메서드
+      - 일정 객체 생성
+      - 생성한 객체를 사용해 일정 Repository에 저장 요청 후 반환 값return
+    - [ ] 전체 일정 조회 메서드
+      - 들어온 조건을 사용해 일정 Repository에 일정 조회 요청 후 반환 값 return
+    - [ ] 특정 일정 조회 메서드
+      - 들어온 id값을 사용해 일정 Repository에 일정 조회 요청 후 반환 값 return
+
+- [ ] 일정 Repository
+  - [ ] 일정 RepositoryImpl
+    - [ ] 일정 저장 메서드
+      - JDBC 테이블 및 컬럼 설정
+      - 파라미터를 들어온 값을 사용해 설정
+      - JDBC에 저장한 이후 Key 값을 받음
+      - Key값 과 들어온 데이터를 반환
+    - [ ] 전체 일정 조회 메서드
+      - 특정 조건에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
+    - [ ] 특정 일정 조회 메서드
+      - 특정 id에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
+
+___
 ## Commit Convention
 
 ### 형식
