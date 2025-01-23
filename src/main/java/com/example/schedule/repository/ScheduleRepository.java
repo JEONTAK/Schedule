@@ -4,6 +4,7 @@ import com.example.schedule.dto.ScheduleResponseDto;
 import com.example.schedule.entity.Schedule;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface ScheduleRepository {
 
@@ -17,5 +18,15 @@ public interface ScheduleRepository {
 
     List<ScheduleResponseDto> findByEditDate(LocalDateTime date);
 
-    ScheduleResponseDto findScheduleById(Long id);
+    Optional<Schedule> findScheduleById(Long id);
+
+    ScheduleResponseDto findScheduleByIdOrElseThrow(Long id);
+
+    int updateContents(Long id, String contents);
+
+    int updateName(Long id, String name);
+
+    int updateSchedule(Long id, String contents, String name);
+
+    int deleteSchedule(Long id);
 }
