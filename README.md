@@ -13,47 +13,122 @@
 #### Definition
 
 - [X] API 명세서 작성
-  - [X] 일정 API 설계
-    - [X] 일정 생성(등록)
-    - [X] 전체 일정 조회
-    - [X] 특정 일정 조회
-    - [X] 특정 일정 수정
-    - [X] 특정 일정 삭제
+    - [X] 일정 API 설계
+        - [X] 일정 생성(등록)
+        - [X] 전체 일정 조회
+        - [X] 특정 일정 조회
+        - [X] 특정 일정 수정
+        - [X] 특정 일정 삭제
 - [X] ERD 작성
-  - [X] schedule
-    - [X] id : 일정 아이디 / BIGINT / (PK)
-    - [X] name : 일정 작성자 / VARCHAR(30)
-    - [X] password : 비밀번호 / VARCHAR(20)
-    - [X] createDate : 작성일 / TIMESTAMP
-    - [X] editDate : 수정일 / TIMESTAMP
+    - [X] schedule
+        - [X] id : 일정 아이디 / BIGINT / (PK)
+        - [X] name : 일정 작성자 / VARCHAR(30)
+        - [X] password : 비밀번호 / VARCHAR(20)
+        - [X] create_date : 작성일 / TIMESTAMP
+        - [X] edit_date : 수정일 / TIMESTAMP
 - [X] SQL 작성
 
 #### API 명세서
 
-| 기능        | HTTP Method | URL                              | request                                                      | Response             | HTTP Status |
-|-----------|-------------|----------------------------------|--------------------------------------------------------------|----------------------|-------------|
-| 일정 생성(등록) | **POST**    | `/schedules`                     |request body를 통해 할일, 작성자명, 비밀번호를 담아 보내 일정 등록 요청.        | 등록 정보 JSON 데이터 반환    | `200 OK`    |
-| 전체 일정 조회  | **GET**     | `/schedules/{name}and{editDate}` |request body 없이 모든 일정을 조회.                            | 조건에 해당하는 JSON 데이터 반환 | `200 OK`    |
-| 특정 일정 조회  | **GET**     | `/schedules/{scheduleId}`        |query parameter로 ID 지정 후 선택 일정 조회.                    | 조건에 해당하는 JSON 데이터 반환 | `200 OK`    |
-| 특정 일정 수정  | **PUT**     | `/schedules/{scheduleId}`        |query parameter로 ID를 지정하고 request body에 데이터를 담아 기존 데이터 수정. | 수정 정보 JSON 데이터 반환    | `200 OK`    |
-| 특정 일정 삭제  | **DELETE**  | `/schedules/{scheduleId}`        |query parameter로 ID 지정 후 선택 일정 삭제.                     | 응답 코드 반환             | `200 OK`    |
-
+|    기능     | HTTP Method |               URL                |                          request                           |       Response       | HTTP Status |
+|:---------:|:-----------:|:--------------------------------:|:----------------------------------------------------------:|:--------------------:|:-----------:|
+| 일정 생성(등록) |  **POST**   |           `/schedules`           |      request body를 통해 할일, 작성자명, 비밀번호를 담아 보내 일정 등록 요청.      |  등록 정보 JSON 데이터 반환   |  `200 OK`   |
+| 전체 일정 조회  |   **GET**   | `/schedules?name={}&editDate={}` |           조건에 맞는 모든 일정을 조회.(조건 미존재 시, 전체 일정 조회)            | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
+| 특정 일정 조회  |   **GET**   |    `/schedules/{scheduleId}`     |             query parameter로 ID 지정 후 선택 일정 조회.             | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
+| 특정 일정 수정  |   **PUT**   |    `/schedules/{scheduleId}`     | query parameter로 ID를 지정하고 request body에 데이터를 담아 기존 데이터 수정. |  수정 정보 JSON 데이터 반환   |  `200 OK`   |
+| 특정 일정 삭제  | **DELETE**  |    `/schedules/{scheduleId}`     |             query parameter로 ID 지정 후 선택 일정 삭제.             |       응답 코드 반환       |  `200 OK`   |
 
 #### ERD 작성
+
 ![img.png](ERD/ERD_Lv0.png)
 
 #### SQL 작성
+
 ```mysql
 CREATE TABLE schedule
 (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '일정 식별자',
-    name VARCHAR(30) COMMENT '작성자',
-    password VARCHAR(20) COMMENT '비밀 번호',
-    createDate TIMESTAMP COMMENT '작성일',
-    editDate TIMESTAMP(20) COMMENT '수정일'
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '일정 식별자',
+    contents    TEXT COMMENT '할 일',
+    name        VARCHAR(30) COMMENT '작성자',
+    password    VARCHAR(20) COMMENT '비밀 번호',
+    create_date TIMESTAMP COMMENT '작성일',
+    edit_date   TIMESTAMP COMMENT '수정일'
 );
 ```
+
 ---
+
+## Lv 1. 일정 생성 및 조회
+
+### Requirement
+
+- 일정 생성
+    - 할일, 작성자명, 비밀번호, 작성/수정일을 저장
+    - 작성/수정일은 날짜와 시간을 모두 포함한 형태
+    - 각 일정의 고유 식별자(ID)를 자동으로 생성하여 관리
+    - 최초 입력시, 수정일과 작성일은 동일
+- 전체 일정 조회
+    - 다음 조건을 바탕으로 등록된 일정 목록을 전부 조회
+        - 수정일(형식 : YYYY-MM-DD)
+        - 작성자명
+    - 조건 중 한 가지만 충족하거나, 둘다 충족을 하지 않을 수도, 두 가지를 모두 충족할 수도 있음.
+    - 수정일 기준 내림차순으로 정렬하여 조회
+- 선택 일정 조회
+    - 선택한 일정 단건의 정보를 조회
+    - ID를 사용하여 조회
+
+#### Configuration
+
+- [X] 일정 Entity
+    - [X] 필드
+        - id
+        - 할일
+        - 작성자명
+        - 비밀번호
+        - 작성/수정일
+
+- [X] 일정 Controller
+    - [X] 일정 생성 메서드
+        - PostMapping 사용
+        - RequestBody 로 데이터를 가져옴
+        - 일정 Service 통해 일정 저장 후 return
+    - [X] 전체 일정 조회 메서드
+        - GetMapping 사용
+        - RequestParam을 통해 수정일, 작성자명 데이터를 가져옴
+        - 일정 Service 통해 조건에 맞는 일정을 List로 가져와 return
+    - [X] 특정 일정 조회 메서드
+        - GetMapping 사용
+        - PathVariable통해 id 값 가져옴
+        - 일정 Service 통해 id값에 맞는 일정 가져와 return
+
+- [X] 일정 RequestDto
+    - id, 작성일, 수정일 제외 데이터 사용
+- [X] 일정 ResponseDto
+    - 전체 데이터 사용
+
+- [X] 일정 Service
+    - [X] 일정 ServiceImpl
+        - [X] 일정 저장 메서드
+            - 일정 객체 생성
+            - 생성한 객체를 사용해 일정 Repository에 저장 요청 후 반환 값return
+        - [X] 전체 일정 조회 메서드
+            - 들어온 조건을 사용해 일정 Repository에 일정 조회 요청 후 반환 값 return
+        - [X] 특정 일정 조회 메서드
+            - 들어온 id값을 사용해 일정 Repository에 일정 조회 요청 후 반환 값 return
+
+- [X] 일정 Repository
+    - [X] 일정 RepositoryImpl
+        - [X] 일정 저장 메서드
+            - JDBC 테이블 및 컬럼 설정
+            - 파라미터를 들어온 값을 사용해 설정
+            - JDBC에 저장한 이후 Key 값을 받음
+            - Key값 과 들어온 데이터를 반환
+        - [X] 전체 일정 조회 메서드
+            - 특정 조건에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
+        - [X] 특정 일정 조회 메서드
+            - 특정 id에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
+
+___
 
 ## Commit Convention
 
