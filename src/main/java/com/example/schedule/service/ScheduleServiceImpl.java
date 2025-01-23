@@ -58,7 +58,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The title and content must be either of them.");
         }
 
-        if (!isMatch(id, password)) {
+        if (isNotMatchPassword(id, password)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Does not match password");
         }
 
@@ -79,13 +79,16 @@ public class ScheduleServiceImpl implements ScheduleService {
         return new ScheduleResponseDto(scheduleRepository.findScheduleById(id).get());
     }
 
-    private boolean isMatch(Long id, String password) {
+    private boolean isNotMatchPassword(Long id, String password) {
         ScheduleResponseDto schedule = scheduleRepository.findScheduleByIdOrElseThrow(id);
-        return Objects.equals(schedule.getPassword(), password);
+        return !Objects.equals(schedule.getPassword(), password);
     }
 
     @Override
-    public void deleteSchedule(Long id) {
+    public void deleteSchedule(Long id, String password) {
+        if (isNotMatchPassword(id, password)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Does not match password");
+        }
         int deleteRow = scheduleRepository.deleteSchedule(id);
 
         if (deleteRow == 0) {

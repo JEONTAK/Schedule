@@ -47,7 +47,8 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public List<ScheduleResponseDto> findAllSchedules(String name, LocalDateTime editDate) {
-        return jdbcTemplate.query("select * from schedule where name = ? and edit_date = ?", scheduleResponseDtoRowMapper(), name,
+        return jdbcTemplate.query("select * from schedule where name = ? and edit_date = ?",
+                scheduleResponseDtoRowMapper(), name,
                 editDate);
     }
 
@@ -63,7 +64,8 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public List<ScheduleResponseDto> findByEditDate(LocalDateTime editDate) {
-        return jdbcTemplate.query("select * from schedule where edit_date = ?", scheduleResponseDtoRowMapper(), editDate);
+        return jdbcTemplate.query("select * from schedule where edit_date = ?", scheduleResponseDtoRowMapper(),
+                editDate);
     }
 
     @Override
