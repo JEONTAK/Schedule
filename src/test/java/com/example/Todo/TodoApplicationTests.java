@@ -1,10 +1,10 @@
-package com.example.schedule;
+package com.example.Todo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ScheduleApplicationTests {
+class TodoApplicationTests {
 
     @Test
     void contextLoads() {

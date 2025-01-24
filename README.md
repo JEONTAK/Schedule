@@ -20,7 +20,7 @@
         - [X] 특정 일정 수정
         - [X] 특정 일정 삭제
 - [X] ERD 작성
-    - [X] schedule
+    - [X] todo
         - [X] id : 일정 아이디 / BIGINT / (PK)
         - [X] name : 일정 작성자 / VARCHAR(30)
         - [X] password : 비밀번호 / VARCHAR(20)
@@ -45,7 +45,7 @@
 #### SQL 작성
 
 ```mysql
-CREATE TABLE schedule
+CREATE TABLE todo
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '일정 식별자',
     contents    TEXT COMMENT '할 일',
@@ -189,6 +189,8 @@ ___
 
 ### Requirement
 
+** Schedule을 Todo로 일괄 변경**
+
 - 작성자와 일정의 연결
     - 동명이인의 작성자가 있어 어떤 작성자가 등록한 `할 일` 인지 구별 할 수 없음
         - 작성자를 식별하기 위해 이름으로만 관리하던 작성자에게 고유 식별자를 부여
@@ -219,12 +221,12 @@ ___
 
 
 - 전체 ERD
-  ![img.png](ERD/ERD_Lv3.png)
+![img.png](ERD/ERD_Lv3.png)
 
 #### SQL
 
 ```mysql
-CREATE TABLE writer
+CREATE TABLE user
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '작성자 식별자',
     name        VARCHAR(30) COMMENT '작성자',
@@ -234,22 +236,22 @@ CREATE TABLE writer
     gender      CHAR(1) COMMENT '성별'
 );
 
-CREATE TABLE schedule
+CREATE TABLE todo
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '일정 식별자',
     contents    TEXT COMMENT '할 일',
-    writer_id   BIGINT COMMENT '작성자 식별자',
+    user_id   BIGINT COMMENT '작성자 식별자',
     password    VARCHAR(20) COMMENT '비밀 번호',
     create_date TIMESTAMP COMMENT '작성일',
     edit_date   TIMESTAMP COMMENT '수정일',
-    FOREIGN KEY (writer_id) REFERENCES writer (id)
+    FOREIGN KEY (user_id) REFERENCES user (id)
 );
 ```
 
 #### Configuration
 
-- [ ] 작성자 Entity
-    - [ ] 필드
+- [X] 작성자 Entity
+    - [X] 필드
         - id / Long
         - 이름 / String
         - 이메일 / String
@@ -257,12 +259,12 @@ CREATE TABLE schedule
         - 수정일 / LocalDateTime
         - 성별 / ENUM
 
-- [ ] 성별 ENUM
+- [X] 성별 ENUM
   - M, F 존재
 
-- [ ] 작성자 RequestDto
+- [X] 작성자 RequestDto
     - id, 작성일, 수정일 제외 데이터 사용
-- [ ] 작성자 ResponseDto
+- [X] 작성자 ResponseDto
     - 전체 데이터 사용
 
 - [ ] 작성자 Controller
@@ -297,31 +299,31 @@ CREATE TABLE schedule
             - 만약 작성자 id, 작성자명, 수정일이 비어있다면
                 - 예외 처리 : BAD_REQUEST
             - 만약 작성자 id, 수정일이 존재한다면
-                - findScheduleByWriterIdAndEditDate()
+                - findTodoByWriterIdAndEditDate()
             - 만약 작성자 id만 존재한다면
-                - findScheduleByWriterId()
+                - findTodoByWriterId()
             - 만약 작성자명, 수정일이 모두 존재한다면
-                - findScheduleByNameAndEditDate()
+                - findTodoByNameAndEditDate()
             - 만약 작성자명만 존재한다면
-                - findScheduleByName()
+                - findTodoByName()
             - 만약 수정일만 존재한다면
-                - findScheduleByEditDate()
+                - findTodoByEditDate()
             - 들어온 데이터를 사용해 일정 Repository에 전체 일정 조회 후 반환 값 return
 
 
 - [ ] 일정 Repository
     - [ ] 일정 RepositoryImpl
         - [ ] 전체 일정 조회 메서드
-            - findScheduleByWriterIdAndEditDate()
-                - 예외 처리 : BAD_REQUEST
-            - findScheduleByWriterId()
-                - a
-            - findScheduleByNameAndEditDate()
-                - ㅁ
-            - findScheduleByName()
-                - ㅁ
-            - findScheduleByEditDate()
-                - ㅁ
+            - findTodoByWriterIdAndEditDate()
+                - Writer id와 edit_date 사용하여 쿼리 검색
+            - findTodoByWriterId()
+                - Writer id 사용하여 쿼리 검색
+            - findTodoByNameAndEditDate()
+                - Name과 edit_date 사용하여 쿼리 검색
+            - findTodoByName()
+                - Name 사용하여 쿼리 검색
+            - findTodoByEditDate()
+                - Edit_date 사용하여 쿼리 검색
             - 각 조건에 맞는 쿼리 작성 후 스케줄 List 반환
 
 ___
