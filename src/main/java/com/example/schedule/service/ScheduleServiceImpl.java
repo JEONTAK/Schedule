@@ -63,18 +63,19 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         int updatedRow = 0;
-
+        LocalDateTime date = LocalDateTime.now();
         if (contents != null && name != null) {
-            updatedRow = scheduleRepository.updateSchedule(id, contents, name);
+            updatedRow = scheduleRepository.updateSchedule(id, contents, name, date);
         } else if (name != null) {
-            updatedRow = scheduleRepository.updateName(id, name);
+            updatedRow = scheduleRepository.updateName(id, name, date);
         } else {
-            updatedRow = scheduleRepository.updateContents(id, contents);
+            updatedRow = scheduleRepository.updateContents(id, contents, date);
         }
 
         if (updatedRow == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
         }
+
 
         return new ScheduleResponseDto(scheduleRepository.findScheduleById(id).get());
     }

@@ -22,11 +22,11 @@ public interface ScheduleRepository {
 
     ScheduleResponseDto findScheduleByIdOrElseThrow(Long id);
 
-    int updateContents(Long id, String contents);
+    int updateContents(Long id, String contents, LocalDateTime date);
 
-    int updateName(Long id, String name);
+    int updateName(Long id, String name, LocalDateTime date);
 
-    int updateSchedule(Long id, String contents, String name);
+    int updateSchedule(Long id, String contents, String name, LocalDateTime date);
 
     int deleteSchedule(Long id);
 }

@@ -85,18 +85,19 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
-    public int updateContents(Long id, String contents) {
-        return jdbcTemplate.update("update schedule set contents = ? where id = ?", contents, id);
+    public int updateContents(Long id, String contents, LocalDateTime date) {
+        return jdbcTemplate.update("update schedule set contents = ?, edit_date = ? where id = ?", contents, date, id);
     }
 
     @Override
-    public int updateName(Long id, String name) {
-        return jdbcTemplate.update("update schedule set name = ? where id = ?", name, id);
+    public int updateName(Long id, String name, LocalDateTime date) {
+        return jdbcTemplate.update("update schedule set name = ?, edit_date = ? where id = ?", name, date, id);
     }
 
     @Override
-    public int updateSchedule(Long id, String contents, String name) {
-        return jdbcTemplate.update("update schedule set contents = ?, name = ? where id = ?", contents, name, id);
+    public int updateSchedule(Long id, String contents, String name, LocalDateTime date) {
+        return jdbcTemplate.update("update schedule set contents = ?, name = ?, edit_date = ? where id = ?", contents,
+                name, date, id);
     }
 
     @Override
