@@ -1,4 +1,4 @@
-package com.example.schedule.entity;
+package com.example.Todo.entity;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class Schedule {
+public class Todo {
 
     private Long id;
     private String contents;
@@ -15,7 +15,7 @@ public class Schedule {
     private LocalDateTime createDate;
     private LocalDateTime editDate;
 
-    public Schedule(String contents, String name, String password, LocalDateTime createDate, LocalDateTime editDate) {
+    public Todo(String contents, String name, String password, LocalDateTime createDate, LocalDateTime editDate) {
         this.contents = contents;
         this.name = name;
         this.password = password;

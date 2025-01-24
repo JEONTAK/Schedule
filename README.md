@@ -20,7 +20,7 @@
         - [X] 특정 일정 수정
         - [X] 특정 일정 삭제
 - [X] ERD 작성
-    - [X] schedule
+    - [X] todo
         - [X] id : 일정 아이디 / BIGINT / (PK)
         - [X] name : 일정 작성자 / VARCHAR(30)
         - [X] password : 비밀번호 / VARCHAR(20)
@@ -45,7 +45,7 @@
 #### SQL 작성
 
 ```mysql
-CREATE TABLE schedule
+CREATE TABLE todo
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '일정 식별자',
     contents    TEXT COMMENT '할 일',
@@ -182,6 +182,149 @@ ___
             - Key값 과 들어온 데이터를 반환
         - [X] 일정 삭제 메서드
             - 특정 조건에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
+
+___
+
+## Lv 3. 연관 관계 설정
+
+### Requirement
+
+** Schedule을 Todo로 일괄 변경**
+
+- 작성자와 일정의 연결
+    - 동명이인의 작성자가 있어 어떤 작성자가 등록한 `할 일` 인지 구별 할 수 없음
+        - 작성자를 식별하기 위해 이름으로만 관리하던 작성자에게 고유 식별자를 부여
+        - 작성자를 할 일과 분리하여 관리
+        - 작성자 테이블을 생성하고, 일정 테이블에 FK를 생성해 연관관계를 설정
+    - 조건
+        - 작성자는 이름 외에 이메일, 등록일, 수정일 정보를 가지고 있음
+            - 작성자의 정보는 추가로 받을 수 있음
+        - 작성자의 고유 식별자를 통해 일정이 검색이 될 수 있도록 전체 일정 조회 코드 수정
+        - 작성자의 고유 식별자가 일정 테이블의 외래키가 될 수 있도록 구현
+
+#### ERD
+
+- [X] 작성자 ERD
+    - id : 작성자 아이디 / BIGINT / (PK)
+    - name : 작성자 이름 / VARCHAR(30)
+    - email : 작성자 이메일 / VARCHAR(40)
+    - create_date : 작성자 등록일 / TIMESTAMP
+    - edit_date : 작성자 수정일 / TIMESTAMP
+    - gender : 성별(추가) / CHAR(1) : 'M', 'F'로 저장
+
+- [X] 스케줄 ERD
+    - id : 일정 아이디 / BIGINT / (PK)
+    - writer_id : 작성자 아이디 / BIGINT / (FK)
+    - password : 비밀번호 / VARCHAR(20)
+    - create_date : 작성일 / TIMESTAMP
+    - edit_date : 수정일 / TIMESTAMP
+
+
+- 전체 ERD
+![img.png](ERD/ERD_Lv3.png)
+
+#### SQL
+
+```mysql
+CREATE TABLE user
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '작성자 식별자',
+    name        VARCHAR(30) COMMENT '작성자',
+    email       VARCHAR(40) COMMENT '비밀 번호',
+    create_date TIMESTAMP COMMENT '등록일',
+    edit_date   TIMESTAMP COMMENT '수정일',
+    gender      CHAR(1) COMMENT '성별'
+);
+
+CREATE TABLE todo
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '일정 식별자',
+    contents    TEXT COMMENT '할 일',
+    user_id   BIGINT COMMENT '작성자 식별자',
+    password    VARCHAR(20) COMMENT '비밀 번호',
+    create_date TIMESTAMP COMMENT '작성일',
+    edit_date   TIMESTAMP COMMENT '수정일',
+    FOREIGN KEY (user_id) REFERENCES user (id)
+);
+```
+
+#### Configuration
+
+- [X] 작성자 Entity
+    - [X] 필드
+        - id / Long
+        - 이름 / String
+        - 이메일 / String
+        - 등록일 / LocalDateTime
+        - 수정일 / LocalDateTime
+        - 성별 / ENUM
+
+- [X] 성별 ENUM
+  - M, F 존재
+
+- [X] 작성자 RequestDto
+    - id, 작성일, 수정일 제외 데이터 사용
+- [X] 작성자 ResponseDto
+    - 전체 데이터 사용
+
+- [ ] 작성자 Controller
+    - [ ] 작성자 생성 메서드
+        - PostMapping 사용
+        - RequestBody 로 데이터를 가져옴
+        - 작성자 Service 통해 작성자 저장 후 return
+
+- [ ] 작성자 Service
+    - [ ] 작성자 ServiceImpl
+        - [ ] 작성자 저장 메서드
+            - 작성자 객체 생성
+            - 생성한 객체를 사용해 일정 Repository에 저장 요청 후 반환 값 return
+
+- [ ] 작성자 Repository
+    - [ ] 작성자 RepositoryImpl
+        - [ ] 작성자 저장 메서드
+            - JDBC 테이블 및 컬럼 설정
+            - 파라미터를 들어온 값을 사용해 설정
+            - JDBC에 저장한 이후 Key 값을 받음
+            - Key값 과 들어온 데이터를 반환
+
+- [ ] 일정 Controller
+    - [ ] 전체 일정 조회 메서드
+        - 작성자의 id값을 통해 일정이 검색이 될 수 있도록 구현
+            - id값은 기존 수정일, 이름 데이터와 같이 RequestParam으로 받음
+            - 일정 Service 통해 조건에 맞는 일정을 List로 가져와 return
+
+- [ ] 일정 Service
+    - [ ] 일정 ServiceImpl
+        - [ ] 전체 일정 조회 메서드
+            - 만약 작성자 id, 작성자명, 수정일이 비어있다면
+                - 예외 처리 : BAD_REQUEST
+            - 만약 작성자 id, 수정일이 존재한다면
+                - findTodoByWriterIdAndEditDate()
+            - 만약 작성자 id만 존재한다면
+                - findTodoByWriterId()
+            - 만약 작성자명, 수정일이 모두 존재한다면
+                - findTodoByNameAndEditDate()
+            - 만약 작성자명만 존재한다면
+                - findTodoByName()
+            - 만약 수정일만 존재한다면
+                - findTodoByEditDate()
+            - 들어온 데이터를 사용해 일정 Repository에 전체 일정 조회 후 반환 값 return
+
+
+- [ ] 일정 Repository
+    - [ ] 일정 RepositoryImpl
+        - [ ] 전체 일정 조회 메서드
+            - findTodoByWriterIdAndEditDate()
+                - Writer id와 edit_date 사용하여 쿼리 검색
+            - findTodoByWriterId()
+                - Writer id 사용하여 쿼리 검색
+            - findTodoByNameAndEditDate()
+                - Name과 edit_date 사용하여 쿼리 검색
+            - findTodoByName()
+                - Name 사용하여 쿼리 검색
+            - findTodoByEditDate()
+                - Edit_date 사용하여 쿼리 검색
+            - 각 조건에 맞는 쿼리 작성 후 스케줄 List 반환
 
 ___
 

@@ -1,9 +1,9 @@
-package com.example.schedule.dto;
+package com.example.Todo.dto;
 
 import lombok.Getter;
 
 @Getter
-public class ScheduleRequestDto {
+public class TodoRequestDto {
 
     private String contents;
     private String name;
