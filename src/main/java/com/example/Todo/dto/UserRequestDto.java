@@ -1,6 +1,5 @@
 package com.example.Todo.dto;
 
-import com.example.Todo.entity.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,6 +9,6 @@ public class UserRequestDto {
 
     private String name;
     private String email;
-    private Gender gender;
+    private String gender;
 
 }

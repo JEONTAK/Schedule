@@ -11,11 +11,11 @@ public class User {
     private Long id;
     private String name;
     private String email;
-    private Gender gender;
+    private String gender;
     private LocalDateTime createDate;
     private LocalDateTime editDate;
 
-    public User(String name, String email, Gender gender, LocalDateTime createDate, LocalDateTime editDate) {
+    public User(String name, String email, String gender, LocalDateTime createDate, LocalDateTime editDate) {
         this.name = name;
         this.email = email;
         this.gender = gender;

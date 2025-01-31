@@ -57,4 +57,17 @@ public class TodoController {
         todoService.deleteTodo(id, requestDto.getPassword());
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+    @PostMapping("/init")
+    public void initialUser() {
+        for (int i = 0; i < 100; i++) {
+            String content = "Hello" + (i + 1);
+            Long userId = (long) (i % 10 + 1);
+            String name = "User" + (userId);
+            String password = "user" + (userId);
+            TodoRequestDto requestDto = new TodoRequestDto(content, userId, name, password);
+            todoService.saveTodo(requestDto);
+        }
+    }
 }

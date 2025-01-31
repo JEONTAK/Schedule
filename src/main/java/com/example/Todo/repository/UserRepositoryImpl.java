@@ -1,7 +1,6 @@
 package com.example.Todo.repository;
 
 import com.example.Todo.dto.UserResponseDto;
-import com.example.Todo.entity.Gender;
 import com.example.Todo.entity.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -79,7 +78,7 @@ public class UserRepositoryImpl implements UserRepository {
                         rs.getLong("id"),
                         rs.getString("name"),
                         rs.getString("email"),
-                        (Gender) rs.getObject("gender"),
+                        rs.getString("gender"),
                         rs.getTimestamp("create_date").toLocalDateTime(),
                         rs.getTimestamp("edit_date").toLocalDateTime()
                 );

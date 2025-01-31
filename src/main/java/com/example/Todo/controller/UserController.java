@@ -42,4 +42,19 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @PostMapping("/init")
+    public void initialUser() {
+        for (int i = 0; i < 100; i++) {
+            String name = "User" + (i + 1);
+            String email = "user" + (i + 1) + "@example.com";
+            if (i % 2 == 0) {
+                UserRequestDto requestDto = new UserRequestDto(name, email, "M");
+                userService.saveUser(requestDto);
+            } else {
+                UserRequestDto requestDto = new UserRequestDto(name, email, "F");
+                userService.saveUser(requestDto);
+            }
+        }
+    }
 }
