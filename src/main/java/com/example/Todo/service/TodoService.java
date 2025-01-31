@@ -2,17 +2,18 @@ package com.example.Todo.service;
 
 import com.example.Todo.dto.TodoRequestDto;
 import com.example.Todo.dto.TodoResponseDto;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TodoService {
 
     TodoResponseDto saveTodo(TodoRequestDto requestDto);
 
-    List<TodoResponseDto> findTodos(Long userId, String editDate);
+    Page<TodoResponseDto> findTodos(Long userId, Pageable pageable);
 
     TodoResponseDto findTodoById(Long id);
 
-    TodoResponseDto updateTodo(Long id, String contents, Long user_id, String name, String password);
+    TodoResponseDto updateTodo(Long id, String contents, Long userId, String name, String password);
 
     void deleteTodo(Long id, String password);
 }

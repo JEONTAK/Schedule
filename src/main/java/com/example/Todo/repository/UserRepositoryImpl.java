@@ -1,7 +1,6 @@
 package com.example.Todo.repository;
 
 import com.example.Todo.dto.UserResponseDto;
-import com.example.Todo.entity.Gender;
 import com.example.Todo.entity.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -21,6 +21,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public UserRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -71,6 +72,12 @@ public class UserRepositoryImpl implements UserRepository {
         return jdbcTemplate.update("delete from user where id = ?", id);
     }
 
+    @Override
+    public String findUserNameById(Long id) {
+        List<User> result = jdbcTemplate.query("select * from user where id = ?", userRowMapper(), id);
+        return result.get(0).getName();
+    }
+
     private RowMapper<User> userRowMapper() {
         return new RowMapper<User>() {
             @Override
@@ -79,7 +86,7 @@ public class UserRepositoryImpl implements UserRepository {
                         rs.getLong("id"),
                         rs.getString("name"),
                         rs.getString("email"),
-                        (Gender) rs.getObject("gender"),
+                        rs.getString("gender"),
                         rs.getTimestamp("create_date").toLocalDateTime(),
                         rs.getTimestamp("edit_date").toLocalDateTime()
                 );

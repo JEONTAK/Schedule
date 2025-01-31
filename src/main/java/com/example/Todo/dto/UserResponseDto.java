@@ -1,6 +1,5 @@
 package com.example.Todo.dto;
 
-import com.example.Todo.entity.Gender;
 import com.example.Todo.entity.User;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -13,7 +12,7 @@ public class UserResponseDto {
     private Long id;
     private String name;
     private String email;
-    private Gender gender;
+    private String gender;
     private LocalDateTime createDate;
     private LocalDateTime editDate;
 

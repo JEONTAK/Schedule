@@ -6,8 +6,9 @@ import com.example.Todo.entity.Todo;
 import com.example.Todo.repository.TodoRepository;
 import com.example.Todo.repository.UserRepository;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,21 +35,11 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public List<TodoResponseDto> findTodos(Long userId, String editDate) {
-        if (userId == null && editDate == null) {
-            return todoRepository.findTodos();
-        }
-
-        if (userId != null && editDate == null) {
-            return todoRepository.findTodoByUserId(userId);
-        }
-
-        LocalDateTime date = LocalDateTime.parse(editDate);
+    public Page<TodoResponseDto> findTodos(Long userId, Pageable pageable) {
         if (userId == null) {
-            return todoRepository.findTodoByEditDate(date);
+            return todoRepository.findTodos(pageable);
         }
-
-        return todoRepository.findTodos(userId, date);
+        return todoRepository.findTodos(userId, pageable);
     }
 
     @Override
@@ -82,7 +73,7 @@ public class TodoServiceImpl implements TodoService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
         }
 
-        return new TodoResponseDto(todoRepository.findTodoById(id).get());
+        return new TodoResponseDto(todoRepository.findTodoById(id).get(), userRepository.findUserNameById(userId));
     }
 
     @Override

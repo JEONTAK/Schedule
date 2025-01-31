@@ -20,4 +20,6 @@ public interface UserRepository {
     int updateUserEmail(Long id, String email, LocalDateTime date);
 
     int deleteUser(Long id);
+
+    String findUserNameById(Long userId);
 }

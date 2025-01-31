@@ -3,6 +3,7 @@ package com.example.Todo.controller;
 import com.example.Todo.dto.UserRequestDto;
 import com.example.Todo.dto.UserResponseDto;
 import com.example.Todo.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,11 +25,13 @@ public class UserController {
     }
 
     @PostMapping
+    @Operation(description = "유저 등록")
     public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto) {
         return new ResponseEntity<>(userService.saveUser(requestDto), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
+    @Operation(description = "유저 수정")
     public ResponseEntity<UserResponseDto> updateTodo(@PathVariable Long id,
                                                       @RequestBody UserRequestDto requestDto) {
         return new ResponseEntity<>(
@@ -37,9 +40,25 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(description = "유저 삭제")
     public ResponseEntity<Void> deleteTodo(@PathVariable Long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @PostMapping("/init")
+    public void initialUser() {
+        for (int i = 0; i < 100; i++) {
+            String name = "User" + (i + 1);
+            String email = "user" + (i + 1) + "@example.com";
+            if (i % 2 == 0) {
+                UserRequestDto requestDto = new UserRequestDto(name, email, "M");
+                userService.saveUser(requestDto);
+            } else {
+                UserRequestDto requestDto = new UserRequestDto(name, email, "F");
+                userService.saveUser(requestDto);
+            }
+        }
+    }
 }
