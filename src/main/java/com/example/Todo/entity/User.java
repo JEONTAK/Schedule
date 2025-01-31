@@ -11,15 +11,15 @@ public class User {
     private Long id;
     private String name;
     private String email;
+    private Gender gender;
     private LocalDateTime createDate;
     private LocalDateTime editDate;
-    private Gender gender;
 
-    public User(String name, String email, LocalDateTime createDate, LocalDateTime editDate, Gender gender) {
+    public User(String name, String email, Gender gender, LocalDateTime createDate, LocalDateTime editDate) {
         this.name = name;
         this.email = email;
+        this.gender = gender;
         this.createDate = createDate;
         this.editDate = editDate;
-        this.gender = gender;
     }
 }

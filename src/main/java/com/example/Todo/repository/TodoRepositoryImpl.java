@@ -29,11 +29,11 @@ public class TodoRepositoryImpl implements TodoRepository {
     @Override
     public TodoResponseDto saveTodo(Todo todo) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-        jdbcInsert.withTableName("schedule").usingGeneratedKeyColumns("id");
+        jdbcInsert.withTableName("todo").usingGeneratedKeyColumns("id");
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("contents", todo.getContents());
-        parameters.put("name", todo.getName());
+        parameters.put("user_id", todo.getUserId());
         parameters.put("password", todo.getPassword());
         parameters.put("create_date", todo.getCreateDate());
         parameters.put("edit_date", todo.getEditDate());
@@ -46,9 +46,9 @@ public class TodoRepositoryImpl implements TodoRepository {
     }
 
     @Override
-    public List<TodoResponseDto> findTodos(String name, LocalDateTime editDate) {
-        return jdbcTemplate.query("select * from todo where name = ? and edit_date = ? order by edit_date desc",
-                todoResponseDtoRowMapper(), name,
+    public List<TodoResponseDto> findTodos(Long userId, LocalDateTime editDate) {
+        return jdbcTemplate.query("select * from todo where user_id = ? and edit_date = ? order by edit_date desc",
+                todoResponseDtoRowMapper(), userId,
                 editDate);
     }
 
@@ -58,13 +58,13 @@ public class TodoRepositoryImpl implements TodoRepository {
     }
 
     @Override
-    public List<TodoResponseDto> findByName(String name) {
-        return jdbcTemplate.query("select * from todo where name = ? order by edit_date desc",
-                todoResponseDtoRowMapper(), name);
+    public List<TodoResponseDto> findTodoByUserId(Long userId) {
+        return jdbcTemplate.query("select * from todo where user_id = ? order by edit_date desc",
+                todoResponseDtoRowMapper(), userId);
     }
 
     @Override
-    public List<TodoResponseDto> findByEditDate(LocalDateTime editDate) {
+    public List<TodoResponseDto> findTodoByEditDate(LocalDateTime editDate) {
         return jdbcTemplate.query("select * from todo where edit_date = ? order by edit_date desc",
                 todoResponseDtoRowMapper(),
                 editDate);
@@ -88,18 +88,7 @@ public class TodoRepositoryImpl implements TodoRepository {
     public int updateContents(Long id, String contents, LocalDateTime date) {
         return jdbcTemplate.update("update todo set contents = ?, edit_date = ? where id = ?", contents, date, id);
     }
-
-    @Override
-    public int updateName(Long id, String name, LocalDateTime date) {
-        return jdbcTemplate.update("update todo set name = ?, edit_date = ? where id = ?", name, date, id);
-    }
-
-    @Override
-    public int updateTodo(Long id, String contents, String name, LocalDateTime date) {
-        return jdbcTemplate.update("update todo set contents = ?, name = ?, edit_date = ? where id = ?", contents,
-                name, date, id);
-    }
-
+    
     @Override
     public int deleteTodo(Long id) {
         return jdbcTemplate.update("delete from todo where id = ?", id);
@@ -112,7 +101,7 @@ public class TodoRepositoryImpl implements TodoRepository {
                 return new TodoResponseDto(
                         rs.getLong("id"),
                         rs.getString("contents"),
-                        rs.getString("name"),
+                        rs.getLong("user_id"),
                         rs.getString("password"),
                         rs.getTimestamp("create_date").toLocalDateTime(),
                         rs.getTimestamp("edit_date").toLocalDateTime()
@@ -128,7 +117,7 @@ public class TodoRepositoryImpl implements TodoRepository {
                 return new Todo(
                         rs.getLong("id"),
                         rs.getString("contents"),
-                        rs.getString("name"),
+                        rs.getLong("user_id"),
                         rs.getString("password"),
                         rs.getTimestamp("create_date").toLocalDateTime(),
                         rs.getTimestamp("edit_date").toLocalDateTime()
