@@ -10,14 +10,14 @@ public class Todo {
 
     private Long id;
     private String contents;
-    private String name;
+    private Long userId;
     private String password;
     private LocalDateTime createDate;
     private LocalDateTime editDate;
 
-    public Todo(String contents, String name, String password, LocalDateTime createDate, LocalDateTime editDate) {
+    public Todo(String contents, Long userId, String password, LocalDateTime createDate, LocalDateTime editDate) {
         this.contents = contents;
-        this.name = name;
+        this.userId = userId;
         this.password = password;
         this.createDate = createDate;
         this.editDate = editDate;

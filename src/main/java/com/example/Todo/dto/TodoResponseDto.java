@@ -11,7 +11,7 @@ public class TodoResponseDto {
 
     private Long id;
     private String contents;
-    private String name;
+    private Long userId;
     private String password;
     private LocalDateTime createDate;
     private LocalDateTime editDate;
@@ -19,7 +19,7 @@ public class TodoResponseDto {
     public TodoResponseDto(Long id, Todo todo) {
         this.id = id;
         this.contents = todo.getContents();
-        this.name = todo.getName();
+        this.userId = todo.getUserId();
         this.password = todo.getPassword();
         this.createDate = todo.getCreateDate();
         this.editDate = todo.getEditDate();
@@ -28,10 +28,9 @@ public class TodoResponseDto {
     public TodoResponseDto(Todo todo) {
         this.id = todo.getId();
         this.contents = todo.getContents();
-        this.name = todo.getName();
+        this.userId = todo.getUserId();
         this.password = todo.getPassword();
         this.createDate = todo.getCreateDate();
         this.editDate = todo.getEditDate();
     }
-
 }

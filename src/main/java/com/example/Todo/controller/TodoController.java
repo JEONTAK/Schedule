@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/schedules")
+@RequestMapping("/todos")
 public class TodoController {
 
     private final TodoService todoService;
@@ -32,9 +32,9 @@ public class TodoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TodoResponseDto>> findTodos(@RequestParam(required = false) String name,
+    public ResponseEntity<List<TodoResponseDto>> findTodos(@RequestParam(required = false) Long userId,
                                                            @RequestParam(required = false) String editDate) {
-        return new ResponseEntity<>(todoService.findTodos(name, editDate), HttpStatus.OK);
+        return new ResponseEntity<>(todoService.findTodos(userId, editDate), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -45,8 +45,9 @@ public class TodoController {
     @PutMapping("/{id}")
     public ResponseEntity<TodoResponseDto> updateTodo(@PathVariable Long id,
                                                       @RequestBody TodoRequestDto requestDto) {
-        return new ResponseEntity<>(todoService.updateTodo(id, requestDto.getContents(), requestDto.getName(),
-                requestDto.getPassword()),
+        return new ResponseEntity<>(
+                todoService.updateTodo(id, requestDto.getContents(), requestDto.getUserId(), requestDto.getName(),
+                        requestDto.getPassword()),
                 HttpStatus.OK);
     }
 

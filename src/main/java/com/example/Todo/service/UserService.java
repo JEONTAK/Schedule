@@ -8,4 +8,8 @@ import org.springframework.stereotype.Service;
 public interface UserService {
 
     UserResponseDto saveUser(UserRequestDto requestDto);
+
+    UserResponseDto updateUser(Long id, String name, String email);
+
+    void deleteUser(Long id);
 }
