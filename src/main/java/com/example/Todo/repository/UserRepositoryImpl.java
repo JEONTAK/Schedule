@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,6 +21,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public UserRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -68,6 +70,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public int deleteUser(Long id) {
         return jdbcTemplate.update("delete from user where id = ?", id);
+    }
+
+    @Override
+    public String findUserNameById(Long id) {
+        List<User> result = jdbcTemplate.query("select * from user where id = ?", userRowMapper(), id);
+        return result.get(0).getName();
     }
 
     private RowMapper<User> userRowMapper() {

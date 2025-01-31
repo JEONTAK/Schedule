@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -46,28 +49,34 @@ public class TodoRepositoryImpl implements TodoRepository {
     }
 
     @Override
-    public List<TodoResponseDto> findTodos(Long userId, LocalDateTime editDate) {
-        return jdbcTemplate.query("select * from todo where user_id = ? and edit_date = ? order by edit_date desc",
-                todoResponseDtoRowMapper(), userId,
-                editDate);
+    public Page<TodoResponseDto> findTodos(Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        int pageNumber = pageable.getPageNumber();
+        int offset = pageNumber * pageSize;
+
+        List<TodoResponseDto> todos = jdbcTemplate.query("select * from todo t join user u on t.user_id = u.id limit ? offset ?",
+                todoResponseDtoRowMapper(), pageSize, offset);
+        int total = getTotalCount();
+
+        return new PageImpl<>(todos, pageable, total);
     }
 
     @Override
-    public List<TodoResponseDto> findTodos() {
-        return jdbcTemplate.query("select * from todo order by edit_date desc", todoResponseDtoRowMapper());
+    public Page<TodoResponseDto> findTodos(Long userId, Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        int pageNumber = pageable.getPageNumber();
+        int offset = pageNumber * pageSize;
+
+        List<TodoResponseDto> todos = jdbcTemplate.query("select * from todo t join user u on t.user_id = u.id where user_id = ? limit ? offset ?",
+                todoResponseDtoRowMapper(), userId, pageSize, offset);
+
+        int total = getTotalCount();
+
+        return new PageImpl<>(todos, pageable, total);
     }
 
-    @Override
-    public List<TodoResponseDto> findTodoByUserId(Long userId) {
-        return jdbcTemplate.query("select * from todo where user_id = ? order by edit_date desc",
-                todoResponseDtoRowMapper(), userId);
-    }
-
-    @Override
-    public List<TodoResponseDto> findTodoByEditDate(LocalDateTime editDate) {
-        return jdbcTemplate.query("select * from todo where edit_date = ? order by edit_date desc",
-                todoResponseDtoRowMapper(),
-                editDate);
+    private int getTotalCount() {
+        return jdbcTemplate.queryForObject("select count(*) from todo", Integer.class);
     }
 
     @Override
@@ -88,7 +97,7 @@ public class TodoRepositoryImpl implements TodoRepository {
     public int updateContents(Long id, String contents, LocalDateTime date) {
         return jdbcTemplate.update("update todo set contents = ?, edit_date = ? where id = ?", contents, date, id);
     }
-    
+
     @Override
     public int deleteTodo(Long id) {
         return jdbcTemplate.update("delete from todo where id = ?", id);
@@ -102,6 +111,7 @@ public class TodoRepositoryImpl implements TodoRepository {
                         rs.getLong("id"),
                         rs.getString("contents"),
                         rs.getLong("user_id"),
+                        rs.getString("name"),
                         rs.getString("password"),
                         rs.getTimestamp("create_date").toLocalDateTime(),
                         rs.getTimestamp("edit_date").toLocalDateTime()

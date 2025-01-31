@@ -323,6 +323,43 @@ CREATE TABLE todo
 
 ___
 
+## Lv 4. 페이지네이션
+
+### Requirement
+
+- 많은 양의 데이터를 효율적으로 표시하기 위해 데이터를 여러 페이지로 나누는 작업
+    - 페이지 번호와 페이지 크기를 쿼리 파라미터로 전달하여 요청하는 항목을 나타냄
+    - 전달받은 페이지 번호와 크기를 기준으로 쿼리를 작성하여 필요한 데이터만을 조회하고 반환
+- 조건
+  - 등록된 일정 목록을 페이지 번호와 크기를 기준으로 모두 조회
+  - 조회한 일정 목록에는 작성자 이름이 포함
+  - 범위를 넘어선 페이지를 요청하는 경우 빈 배열을 반환
+  - Paging 객체 활용
+
+#### Configuration
+
+- [X] 일정 Controller
+    - [X] 페이징 일정 조회 메서드(GET)
+        - 페이지 번호와 크기를 Query Parameter로 받아옴
+        - 위 두개의 데이터를 Pageable 객체를 사용해 저장하고, 일정 service에 보내 데이터 요청
+        - 기존 전체 일정 조회 메서드를 제거하고, 해당 메서드를 통해 전체 일정 조회 가능하도록 설정
+          - userId값 통해 특정 작성자만 조회 할 수 있도록 구현
+
+- [X] 일정 Service
+    - [X] 일정 ServiceImpl
+        - [X] 페이징 일정 조회 메서드
+            - 받아온 Pageable 객체를 일정 repository에 넘겨준 후 반환된 데이터 return
+
+
+- [X] 일정 Repository
+    - [X] 일정 RepositoryImpl
+        - [X] 페이징 일정 조회 메서드
+            - 받아온 Pageable 에서 pageSize, pageNumber, offset 값을 구함
+            - pageSize와 offset을 통해 List 형식으로 Todo 리스트를 반환 받음
+            - List 형식으로 저장된 Todo 리스트를 PageImpl을 통해 Page화 시켜 반환
+
+___
+
 ## Commit Convention
 
 ### 형식

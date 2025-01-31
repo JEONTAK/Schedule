@@ -3,20 +3,17 @@ package com.example.Todo.repository;
 import com.example.Todo.dto.TodoResponseDto;
 import com.example.Todo.entity.Todo;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TodoRepository {
 
     TodoResponseDto saveTodo(Todo todo);
 
-    List<TodoResponseDto> findTodos(Long userId, LocalDateTime editDate);
+    Page<TodoResponseDto> findTodos(Pageable pageable);
 
-    List<TodoResponseDto> findTodos();
-
-    List<TodoResponseDto> findTodoByUserId(Long userId);
-
-    List<TodoResponseDto> findTodoByEditDate(LocalDateTime date);
+    Page<TodoResponseDto> findTodos(Long userId, Pageable pageable);
 
     Optional<Todo> findTodoById(Long id);
 
