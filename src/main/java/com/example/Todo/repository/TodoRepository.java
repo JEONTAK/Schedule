@@ -10,23 +10,19 @@ public interface TodoRepository {
 
     TodoResponseDto saveTodo(Todo todo);
 
-    List<TodoResponseDto> findTodos(String name, LocalDateTime editDate);
+    List<TodoResponseDto> findTodos(Long userId, LocalDateTime editDate);
 
     List<TodoResponseDto> findTodos();
 
-    List<TodoResponseDto> findByName(String name);
+    List<TodoResponseDto> findTodoByUserId(Long userId);
 
-    List<TodoResponseDto> findByEditDate(LocalDateTime date);
+    List<TodoResponseDto> findTodoByEditDate(LocalDateTime date);
 
     Optional<Todo> findTodoById(Long id);
 
     TodoResponseDto findTodoByIdOrElseThrow(Long id);
 
     int updateContents(Long id, String contents, LocalDateTime date);
-
-    int updateName(Long id, String name, LocalDateTime date);
-
-    int updateTodo(Long id, String contents, String name, LocalDateTime date);
 
     int deleteTodo(Long id);
 }

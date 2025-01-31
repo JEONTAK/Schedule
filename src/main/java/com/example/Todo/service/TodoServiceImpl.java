@@ -4,6 +4,7 @@ import com.example.Todo.dto.TodoRequestDto;
 import com.example.Todo.dto.TodoResponseDto;
 import com.example.Todo.entity.Todo;
 import com.example.Todo.repository.TodoRepository;
+import com.example.Todo.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -15,36 +16,39 @@ import org.springframework.web.server.ResponseStatusException;
 public class TodoServiceImpl implements TodoService {
 
     private final TodoRepository todoRepository;
+    private final UserRepository userRepository;
 
-    public TodoServiceImpl(TodoRepository todoRepository) {
+    public TodoServiceImpl(TodoRepository todoRepository, UserRepository userRepository) {
         this.todoRepository = todoRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public TodoResponseDto saveTodo(TodoRequestDto requestDto) {
         LocalDateTime createDate = LocalDateTime.now();
-        Todo todo = new Todo(requestDto.getContents(), requestDto.getName(), requestDto.getPassword(),
+        Todo todo = new Todo(requestDto.getContents(), requestDto.getUserId(),
+                requestDto.getPassword(),
                 createDate, createDate);
 
         return todoRepository.saveTodo(todo);
     }
 
     @Override
-    public List<TodoResponseDto> findTodos(String name, String editDate) {
-        if (name == null && editDate == null) {
+    public List<TodoResponseDto> findTodos(Long userId, String editDate) {
+        if (userId == null && editDate == null) {
             return todoRepository.findTodos();
         }
 
-        if (name != null && editDate == null) {
-            return todoRepository.findByName(name);
+        if (userId != null && editDate == null) {
+            return todoRepository.findTodoByUserId(userId);
         }
 
         LocalDateTime date = LocalDateTime.parse(editDate);
-        if (name == null) {
-            return todoRepository.findByEditDate(date);
+        if (userId == null) {
+            return todoRepository.findTodoByEditDate(date);
         }
 
-        return todoRepository.findTodos(name, date);
+        return todoRepository.findTodos(userId, date);
     }
 
     @Override
@@ -53,8 +57,8 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public TodoResponseDto updateTodo(Long id, String contents, String name, String password) {
-        if (contents == null && name == null) {
+    public TodoResponseDto updateTodo(Long id, String contents, Long userId, String name, String password) {
+        if (contents == null && userId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The title and content must be either of them.");
         }
 
@@ -64,10 +68,12 @@ public class TodoServiceImpl implements TodoService {
 
         int updatedRow = 0;
         LocalDateTime date = LocalDateTime.now();
-        if (contents != null && name != null) {
-            updatedRow = todoRepository.updateTodo(id, contents, name, date);
-        } else if (name != null) {
-            updatedRow = todoRepository.updateName(id, name, date);
+
+        if (contents != null && userId != null) {
+            updatedRow = todoRepository.updateContents(id, contents, date);
+            updatedRow += userRepository.updateUserName(userId, name, date);
+        } else if (userId != null) {
+            updatedRow = userRepository.updateUserName(userId, name, date);
         } else {
             updatedRow = todoRepository.updateContents(id, contents, date);
         }
@@ -92,7 +98,7 @@ public class TodoServiceImpl implements TodoService {
     }
 
     private boolean isNotMatchPassword(Long id, String password) {
-        TodoResponseDto schedule = todoRepository.findTodoByIdOrElseThrow(id);
-        return !Objects.equals(schedule.getPassword(), password);
+        TodoResponseDto todo = todoRepository.findTodoByIdOrElseThrow(id);
+        return !Objects.equals(todo.getPassword(), password);
     }
 }

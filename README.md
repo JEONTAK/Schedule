@@ -1,4 +1,4 @@
-# Schedule
+# Todo
 
 ---
 
@@ -30,13 +30,13 @@
 
 #### API 명세서
 
-|    기능     | HTTP Method |                      URL                       |                          request                           |       Response       | HTTP Status |
-|:---------:|:-----------:|:----------------------------------------------:|:----------------------------------------------------------:|:--------------------:|:-----------:|
-| 일정 생성(등록) |  **POST**   |                  `/schedules`                  |      request body를 통해 할일, 작성자명, 비밀번호를 담아 보내 일정 등록 요청.      |  등록 정보 JSON 데이터 반환   |  `200 OK`   |
-| 전체 일정 조회  |   **GET**   | `/schedules?name={name}&edit_date={edit_date}` |           조건에 맞는 모든 일정을 조회.(조건 미존재 시, 전체 일정 조회)            | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
-| 특정 일정 조회  |   **GET**   |           `/schedules/{schedule_id}`           |             query parameter로 ID 지정 후 선택 일정 조회.             | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
-| 특정 일정 수정  |   **PUT**   |           `/schedules/{schedule_id}`           | query parameter로 ID를 지정하고 request body에 데이터를 담아 기존 데이터 수정. |  수정 정보 JSON 데이터 반환   |  `200 OK`   |
-| 특정 일정 삭제  | **DELETE**  |           `/schedules/{schedule_id}`           |             query parameter로 ID 지정 후 선택 일정 삭제.             |       응답 코드 반환       |  `200 OK`   |
+|    기능     | HTTP Method |                    URL                     |                          request                           |       Response       | HTTP Status |
+|:---------:|:-----------:|:------------------------------------------:|:----------------------------------------------------------:|:--------------------:|:-----------:|
+| 일정 생성(등록) |  **POST**   |                  `/todos`                  |      request body를 통해 할일, 작성자명, 비밀번호를 담아 보내 일정 등록 요청.      |  등록 정보 JSON 데이터 반환   |  `200 OK`   |
+| 전체 일정 조회  |   **GET**   | `/todos?name={name}&edit_date={edit_date}` |           조건에 맞는 모든 일정을 조회.(조건 미존재 시, 전체 일정 조회)            | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
+| 특정 일정 조회  |   **GET**   |            `/todos/{todos_id}`             |             query parameter로 ID 지정 후 선택 일정 조회.             | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
+| 특정 일정 수정  |   **PUT**   |            `/todos/{todos_id}`             | query parameter로 ID를 지정하고 request body에 데이터를 담아 기존 데이터 수정. |  수정 정보 JSON 데이터 반환   |  `200 OK`   |
+| 특정 일정 삭제  | **DELETE**  |            `/todos/{todos_id}`             |             query parameter로 ID 지정 후 선택 일정 삭제.             |       응답 코드 반환       |  `200 OK`   |
 
 #### ERD 작성
 
@@ -176,12 +176,9 @@ ___
 - [X] 일정 Repository
     - [X] 일정 RepositoryImpl
         - [X] 일정 수정 메서드
-            - JDBC 테이블 및 컬럼 설정
-            - 파라미터를 들어온 값을 사용해 설정
-            - JDBC에 저장한 이후 Key 값을 받음
-            - Key값 과 들어온 데이터를 반환
+            - 들어온 id값에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 수정 후 반환
         - [X] 일정 삭제 메서드
-            - 특정 조건에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 반환
+            - 들어온 id값에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 삭제
 
 ___
 
@@ -221,7 +218,7 @@ ___
 
 
 - 전체 ERD
-![img.png](ERD/ERD_Lv3.png)
+  ![img.png](ERD/ERD_Lv3.png)
 
 #### SQL
 
@@ -240,7 +237,7 @@ CREATE TABLE todo
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '일정 식별자',
     contents    TEXT COMMENT '할 일',
-    user_id   BIGINT COMMENT '작성자 식별자',
+    user_id     BIGINT COMMENT '작성자 식별자',
     password    VARCHAR(20) COMMENT '비밀 번호',
     create_date TIMESTAMP COMMENT '작성일',
     edit_date   TIMESTAMP COMMENT '수정일',
@@ -260,68 +257,66 @@ CREATE TABLE todo
         - 성별 / ENUM
 
 - [X] 성별 ENUM
-  - M, F 존재
+    - M, F 존재
 
 - [X] 작성자 RequestDto
     - id, 작성일, 수정일 제외 데이터 사용
 - [X] 작성자 ResponseDto
     - 전체 데이터 사용
 
-- [ ] 작성자 Controller
-    - [ ] 작성자 생성 메서드
+- [X] 작성자 Controller
+    - [X] 작성자 생성 메서드
         - PostMapping 사용
         - RequestBody 로 데이터를 가져옴
         - 작성자 Service 통해 작성자 저장 후 return
 
-- [ ] 작성자 Service
-    - [ ] 작성자 ServiceImpl
-        - [ ] 작성자 저장 메서드
+- [X] 작성자 Service
+    - [X] 작성자 ServiceImpl
+        - [X] 작성자 저장 메서드
             - 작성자 객체 생성
             - 생성한 객체를 사용해 일정 Repository에 저장 요청 후 반환 값 return
 
-- [ ] 작성자 Repository
-    - [ ] 작성자 RepositoryImpl
-        - [ ] 작성자 저장 메서드
+- [X] 작성자 Repository
+    - [X] 작성자 RepositoryImpl
+        - [X] 작성자 저장 메서드
             - JDBC 테이블 및 컬럼 설정
             - 파라미터를 들어온 값을 사용해 설정
             - JDBC에 저장한 이후 Key 값을 받음
             - Key값 과 들어온 데이터를 반환
+        - [X] 작성자 수정 메서드
+            - 들어온 id 값에 해당하는 데이터를 JDBC에서 query를 사용해 받아와 수정 후 반환
 
-- [ ] 일정 Controller
-    - [ ] 전체 일정 조회 메서드
+- [X] 일정 Controller
+    - [X] 전체 일정 조회 메서드
         - 작성자의 id값을 통해 일정이 검색이 될 수 있도록 구현
-            - id값은 기존 수정일, 이름 데이터와 같이 RequestParam으로 받음
+            - id값을 이름 데이터 대신 사용, RequestParam으로 받음
             - 일정 Service 통해 조건에 맞는 일정을 List로 가져와 return
+    - [X] 일정 수정 메서드
+        - name 부분을 User 엔티티로 이동하였기 때문에, userId값과 name을 통한 수정 구현
 
-- [ ] 일정 Service
-    - [ ] 일정 ServiceImpl
-        - [ ] 전체 일정 조회 메서드
-            - 만약 작성자 id, 작성자명, 수정일이 비어있다면
+- [X] 일정 Service
+    - [X] 일정 ServiceImpl
+        - [X] 전체 일정 조회 메서드
+            - 만약 작성자 id, 수정일이 비어있다면
                 - 예외 처리 : BAD_REQUEST
             - 만약 작성자 id, 수정일이 존재한다면
-                - findTodoByWriterIdAndEditDate()
+                - findTodos()
             - 만약 작성자 id만 존재한다면
-                - findTodoByWriterId()
-            - 만약 작성자명, 수정일이 모두 존재한다면
-                - findTodoByNameAndEditDate()
-            - 만약 작성자명만 존재한다면
-                - findTodoByName()
+                - findTodoByUserId()
             - 만약 수정일만 존재한다면
                 - findTodoByEditDate()
             - 들어온 데이터를 사용해 일정 Repository에 전체 일정 조회 후 반환 값 return
+        - [ ] 일정 수정 메서드
+            - 들어온 userId, name을 사용해 작성자 Repository에서 수정
 
 
-- [ ] 일정 Repository
-    - [ ] 일정 RepositoryImpl
-        - [ ] 전체 일정 조회 메서드
-            - findTodoByWriterIdAndEditDate()
+- [X] 일정 Repository
+    - [X] 일정 RepositoryImpl
+        - [X] 전체 일정 조회 메서드
+            - findTodos()
                 - Writer id와 edit_date 사용하여 쿼리 검색
-            - findTodoByWriterId()
+            - findTodoByUserId()
                 - Writer id 사용하여 쿼리 검색
-            - findTodoByNameAndEditDate()
-                - Name과 edit_date 사용하여 쿼리 검색
-            - findTodoByName()
-                - Name 사용하여 쿼리 검색
             - findTodoByEditDate()
                 - Edit_date 사용하여 쿼리 검색
             - 각 조건에 맞는 쿼리 작성 후 스케줄 List 반환
