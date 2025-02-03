@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/todos")
+@RequestMapping("/api")
 public class TodoController {
 
     private final TodoService todoService;
@@ -29,13 +29,13 @@ public class TodoController {
         this.todoService = todoService;
     }
 
-    @PostMapping
+    @PostMapping("/todos")
     @Operation(description = "할일 등록")
     public ResponseEntity<TodoResponseDto> createTodo(@RequestBody TodoRequestDto requestDto) {
         return new ResponseEntity<>(todoService.saveTodo(requestDto), HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/todos")
     @Operation(description = "페이징을 이용한 할일 조회, 추가적으로 유저 아이디 입력시 해당 유저의 할일 조회 가능")
     public ResponseEntity<Page<TodoResponseDto>> findTodos(@RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size,
@@ -44,13 +44,13 @@ public class TodoController {
         return new ResponseEntity<>(todoService.findTodos(userId, pageable), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/todos/{id}")
     @Operation(description = "개별 할일 조회")
     public ResponseEntity<TodoResponseDto> findTodoById(@PathVariable Long id) {
         return new ResponseEntity<>(todoService.findTodoById(id), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/todos/{id}")
     @Operation(description = "할일 수정")
     public ResponseEntity<TodoResponseDto> updateTodo(@PathVariable Long id,
                                                       @RequestBody TodoRequestDto requestDto) {
@@ -60,7 +60,7 @@ public class TodoController {
                 HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/todos/{id}")
     @Operation(description = "할일 삭제")
     public ResponseEntity<Void> deleteTodo(@PathVariable Long id,
                                            @RequestBody TodoRequestDto requestDto) {
@@ -69,8 +69,8 @@ public class TodoController {
     }
 
 
-    @PostMapping("/init")
-    public void initialUser() {
+    @PostMapping("/todos/init")
+    public void initialTodos() {
         for (int i = 0; i < 100; i++) {
             String content = "Hello" + (i + 1);
             Long userId = (long) (i % 10 + 1);
