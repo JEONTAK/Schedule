@@ -1,11 +1,15 @@
 package com.example.Todo.controller;
 
+import com.example.Todo.Exception.CustomException;
+import com.example.Todo.Exception.ErrorCode;
 import com.example.Todo.dto.UserRequestDto;
 import com.example.Todo.dto.UserResponseDto;
 import com.example.Todo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,14 +30,22 @@ public class UserController {
 
     @PostMapping("/users")
     @Operation(description = "유저 등록")
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto requestDto,
+                                                      BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new CustomException(ErrorCode.USER_SAVE_BAD_REQUEST);
+        }
         return new ResponseEntity<>(userService.saveUser(requestDto), HttpStatus.OK);
     }
 
     @PutMapping("/users/{id}")
     @Operation(description = "유저 수정")
     public ResponseEntity<UserResponseDto> updateTodo(@PathVariable Long id,
-                                                      @RequestBody UserRequestDto requestDto) {
+                                                      @Valid @RequestBody UserRequestDto requestDto,
+                                                      BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new CustomException(ErrorCode.USER_SAVE_BAD_REQUEST);
+        }
         return new ResponseEntity<>(
                 userService.updateUser(id, requestDto.getName(), requestDto.getEmail()),
                 HttpStatus.OK);

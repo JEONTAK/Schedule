@@ -1,14 +1,18 @@
 package com.example.Todo.controller;
 
+import com.example.Todo.Exception.CustomException;
+import com.example.Todo.Exception.ErrorCode;
 import com.example.Todo.dto.TodoRequestDto;
 import com.example.Todo.dto.TodoResponseDto;
 import com.example.Todo.service.TodoService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +35,12 @@ public class TodoController {
 
     @PostMapping("/todos")
     @Operation(description = "할일 등록")
-    public ResponseEntity<TodoResponseDto> createTodo(@RequestBody TodoRequestDto requestDto) {
+    public ResponseEntity<TodoResponseDto> createTodo(@Valid @RequestBody TodoRequestDto requestDto,
+                                                      BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new CustomException(ErrorCode.TODO_SAVE_BAD_REQUEST);
+        }
+
         return new ResponseEntity<>(todoService.saveTodo(requestDto), HttpStatus.OK);
     }
 
@@ -53,9 +62,13 @@ public class TodoController {
     @PutMapping("/todos/{id}")
     @Operation(description = "할일 수정")
     public ResponseEntity<TodoResponseDto> updateTodo(@PathVariable Long id,
-                                                      @RequestBody TodoRequestDto requestDto) {
+                                                      @Valid @RequestBody TodoRequestDto requestDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new CustomException(ErrorCode.TODO_UPDATE_DATA_BAD_REQUEST);
+        }
+
         return new ResponseEntity<>(
-                todoService.updateTodo(id, requestDto.getContents(), requestDto.getUserId(), requestDto.getName(),
+                todoService.updateTodo(id, requestDto.getContents(), requestDto.getUserId(), requestDto.getUserName(),
                         requestDto.getPassword()),
                 HttpStatus.OK);
     }
@@ -63,7 +76,11 @@ public class TodoController {
     @DeleteMapping("/todos/{id}")
     @Operation(description = "할일 삭제")
     public ResponseEntity<Void> deleteTodo(@PathVariable Long id,
-                                           @RequestBody TodoRequestDto requestDto) {
+                                           @Valid @RequestBody TodoRequestDto requestDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new CustomException(ErrorCode.TODO_DELETE_BAD_REQUEST);
+        }
+
         todoService.deleteTodo(id, requestDto.getPassword());
         return new ResponseEntity<>(HttpStatus.OK);
     }
