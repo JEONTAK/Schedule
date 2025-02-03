@@ -26,10 +26,6 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public TodoResponseDto saveTodo(TodoRequestDto requestDto) {
-        if (isNullRequestDto(requestDto)) {
-            throw new CustomException(ErrorCode.TODO_SAVE_BAD_REQUEST);
-        }
-
         LocalDateTime createDate = LocalDateTime.now();
         Todo todo = new Todo(requestDto.getContents(), requestDto.getUserId(),
                 requestDto.getPassword(),
@@ -38,10 +34,6 @@ public class TodoServiceImpl implements TodoService {
         return todoRepository.saveTodo(todo);
     }
 
-    private boolean isNullRequestDto(TodoRequestDto requestDto) {
-        return requestDto.getContents() == null || requestDto.getName() == null || requestDto.getUserId() == null
-                || requestDto.getPassword() == null;
-    }
 
     @Override
     public Page<TodoResponseDto> findTodos(Long userId, Pageable pageable) {

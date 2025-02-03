@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
         int deleteRow = userRepository.deleteUser(id);
 
         if (deleteRow == 0) {
-            throw new CustomException(ErrorCode.USER_UPDATE_ID_NOT_FOUND);
+            throw new CustomException(ErrorCode.USER_DELETE_ID_NOT_FOUND);
         }
     }
 }

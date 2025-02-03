@@ -18,8 +18,20 @@ public class GlobalException {
                 HttpStatus.valueOf(exception.getErrorCode().getStatus()));
     }
 
-    @ExceptionHandler({ Exception.class })
+    /*@ExceptionHandler({MethodArgumentNotValidException.class})
+    protected ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }*/
+
+    @ExceptionHandler({Exception.class})
     protected ResponseEntity handleServerException(Exception ex) {
-        return new ResponseEntity(new ErrorDto(INTERNAL_SERVER_ERROR.getStatus(), INTERNAL_SERVER_ERROR.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        System.out.println(ex.getClass().getName());
+
+        return new ResponseEntity(new ErrorDto(INTERNAL_SERVER_ERROR.getStatus(), INTERNAL_SERVER_ERROR.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

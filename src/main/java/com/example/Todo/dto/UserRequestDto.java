@@ -1,5 +1,6 @@
 package com.example.Todo.dto;
 
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,7 +9,9 @@ import lombok.Getter;
 public class UserRequestDto {
 
     private String name;
-    private String email;
-    private String gender;
 
+    @Email(message = "이메일 형식이 아닙니다.")
+    private String email;
+
+    private String gender;
 }
