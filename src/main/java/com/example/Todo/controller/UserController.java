@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
@@ -24,13 +24,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/users")
     @Operation(description = "유저 등록")
     public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto) {
         return new ResponseEntity<>(userService.saveUser(requestDto), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/users/{id}")
     @Operation(description = "유저 수정")
     public ResponseEntity<UserResponseDto> updateTodo(@PathVariable Long id,
                                                       @RequestBody UserRequestDto requestDto) {
@@ -39,7 +39,7 @@ public class UserController {
                 HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/users/{id}")
     @Operation(description = "유저 삭제")
     public ResponseEntity<Void> deleteTodo(@PathVariable Long id) {
         userService.deleteUser(id);
@@ -47,7 +47,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/init")
+    @PostMapping("/users/init")
     public void initialUser() {
         for (int i = 0; i < 100; i++) {
             String name = "User" + (i + 1);

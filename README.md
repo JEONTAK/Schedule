@@ -1,5 +1,6 @@
 # Todo
 
+
 ---
 
 ## Lv 0. API 명세 및 ERD 작성
@@ -37,6 +38,11 @@
 | 특정 일정 조회  |   **GET**   |            `/todos/{todos_id}`             |             query parameter로 ID 지정 후 선택 일정 조회.             | 조건에 해당하는 JSON 데이터 반환 |  `200 OK`   |
 | 특정 일정 수정  |   **PUT**   |            `/todos/{todos_id}`             | query parameter로 ID를 지정하고 request body에 데이터를 담아 기존 데이터 수정. |  수정 정보 JSON 데이터 반환   |  `200 OK`   |
 | 특정 일정 삭제  | **DELETE**  |            `/todos/{todos_id}`             |             query parameter로 ID 지정 후 선택 일정 삭제.             |       응답 코드 반환       |  `200 OK`   |
+
+[**Swagger** 사용](http://localhost:8080/swagger-ui.html)
+
+local에서 해당 프로젝트 실행 후 위 링크 통해 확인 가능.
+
 
 #### ERD 작성
 
@@ -216,7 +222,6 @@ ___
     - create_date : 작성일 / TIMESTAMP
     - edit_date : 수정일 / TIMESTAMP
 
-
 - 전체 ERD
   ![img.png](ERD/ERD_Lv3.png)
 
@@ -306,7 +311,7 @@ CREATE TABLE todo
             - 만약 수정일만 존재한다면
                 - findTodoByEditDate()
             - 들어온 데이터를 사용해 일정 Repository에 전체 일정 조회 후 반환 값 return
-        - [ ] 일정 수정 메서드
+        - [X] 일정 수정 메서드
             - 들어온 userId, name을 사용해 작성자 Repository에서 수정
 
 
@@ -358,6 +363,51 @@ ___
             - pageSize와 offset을 통해 List 형식으로 Todo 리스트를 반환 받음
             - List 형식으로 저장된 Todo 리스트를 PageImpl을 통해 Page화 시켜 반환
 
+___
+
+## Lv 5. 페이지네이션
+
+### Requirement
+
+- 에외 상황에 대한 처리를 위해 HTTP 상태 코드와 에러 메시지를 포함한 정보를 사용하여 예외 처리
+  - 필요에 따라 사용자 정의 예외 클래스를 생성하여 예외 처리를 수행 가능
+  - @ExceptionHandler를 활용하여 공통 예외 처리를 구현 가능
+  - 예외가 발생할 경우 적절한 HTTP 상태 코드와 함께 사용자에게 메시지를 전달하여 상황 관리
+- 조건
+  - 수정, 삭제 시 요청할 때 보내는 비밀번호가 일치 하지 않을 때 예외 발생
+  - 선택한 일정 정보를 조회할 수 없을 때 예외 발생
+    - 잘못된 정보 조회
+    - 이미 삭제된 정보 조회
+
+#### Configuration
+
+- [X] 수정, 삭제 시 요청할 때 보내는 비밀번호가 일치 하지 않을 때 예외 발생
+- [X] 선택한 일정 정보를 조회할 수 없을 때 예외 발생
+    - [X] 잘못된 정보 조회
+- [X] 수정, 삭제 시 존재하지 않는 할일, 유저를 수정, 삭제하도록 요청 받았을 때 예외 발생
+- [X] 할일, 유저 등록시 필수 데이터가 들어오지 않았을 때 예외 발생
+
+- [X] Enum 클래스 생성해 에러코드 저장
+  - ErrorCode 클래스 생성
+    - TODO_SAVE_BAD_REQUEST(400,"할일 등록시 내용, 유저 아이디, 비밀번호가 존재해야 합니다.")
+    - TODO_UPDATE_DATA_BAD_REQUEST(400,"할일 수정시 내용, 유저 아이디가 존재해야 합니다.")
+    - INVALID_PASSWORD(400,"할일 수정시 비밀번호가 일치해야 합니다.")
+    - TODO_UPDATE_ID_BAD_REQUEST(400,"존재하는 할일만 수정 가능합니다.")
+    - USER_SAVE_BAD_REQUEST(400,"유저 등록시 이름, 이메일, 성별이 존재해야 합니다.")
+    - USER_UPDATE_DATA_BAD_REQUEST(400,"유저 정보 수정시 이름, 이메일이 존재해야 합니다.")
+    - USER_UPDATE_ID_BAD_REQUEST(400,"존재하는 유저만 수정 가능합니다.")
+
+- [X] CustomException 생성
+  - ErrorCode를 사용하기 위한 CustomException class 생성
+
+- [X] GlobalException 생성
+  - CustomException을 사용하여 에러코드를 통해 에러를 처리하기 위한 class 생성
+
+**참고**
+
+[@ExceptionHandler를 통한 예외처리](https://velog.io/@kiiiyeon/%EC%8A%A4%ED%94%84%EB%A7%81-ExceptionHandler%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC)
+
+[Springboot Exception Handling(스프링부트 exception 핸들링)](https://samtao.tistory.com/42)
 ___
 
 ## Commit Convention
