@@ -54,7 +54,8 @@ public class TodoRepositoryImpl implements TodoRepository {
         int pageNumber = pageable.getPageNumber();
         int offset = pageNumber * pageSize;
 
-        List<TodoResponseDto> todos = jdbcTemplate.query("select * from todo t join user u on t.user_id = u.id limit ? offset ?",
+        List<TodoResponseDto> todos = jdbcTemplate.query(
+                "select * from todo t join user u on t.user_id = u.id limit ? offset ?",
                 todoResponseDtoRowMapper(), pageSize, offset);
         int total = getTotalCount();
 
@@ -67,7 +68,8 @@ public class TodoRepositoryImpl implements TodoRepository {
         int pageNumber = pageable.getPageNumber();
         int offset = pageNumber * pageSize;
 
-        List<TodoResponseDto> todos = jdbcTemplate.query("select * from todo t join user u on t.user_id = u.id where user_id = ? limit ? offset ?",
+        List<TodoResponseDto> todos = jdbcTemplate.query(
+                "select * from todo t join user u on t.user_id = u.id where user_id = ? limit ? offset ?",
                 todoResponseDtoRowMapper(), userId, pageSize, offset);
 
         int total = getTotalCount();
