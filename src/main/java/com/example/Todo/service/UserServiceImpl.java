@@ -1,6 +1,6 @@
 package com.example.Todo.service;
 
-import com.example.Todo.Exception.CustomException;
+import com.example.Todo.Exception.CustomExceptionHandler;
 import com.example.Todo.Exception.ErrorCode;
 import com.example.Todo.dto.UserRequestDto;
 import com.example.Todo.dto.UserResponseDto;
@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto saveUser(UserRequestDto requestDto) {
         if (isNullRequestDto(requestDto)) {
-            throw new CustomException(ErrorCode.USER_SAVE_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.USER_SAVE_BAD_REQUEST);
         }
 
         LocalDateTime createDate = LocalDateTime.now();
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto updateUser(Long id, String name, String email) {
         if (name == null && email == null) {
-            throw new CustomException(ErrorCode.USER_UPDATE_DATA_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.USER_UPDATE_DATA_BAD_REQUEST);
         }
 
         LocalDateTime date = LocalDateTime.now();
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (updatedRow == 0) {
-            throw new CustomException(ErrorCode.USER_UPDATE_ID_NOT_FOUND);
+            throw new CustomExceptionHandler(ErrorCode.USER_UPDATE_ID_NOT_FOUND);
         }
 
         return new UserResponseDto(userRepository.findUserById(id).get());
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
         int deleteRow = userRepository.deleteUser(id);
 
         if (deleteRow == 0) {
-            throw new CustomException(ErrorCode.USER_DELETE_ID_NOT_FOUND);
+            throw new CustomExceptionHandler(ErrorCode.USER_DELETE_ID_NOT_FOUND);
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.example.Todo.service;
 
-import com.example.Todo.Exception.CustomException;
+import com.example.Todo.Exception.CustomExceptionHandler;
 import com.example.Todo.Exception.ErrorCode;
 import com.example.Todo.dto.TodoRequestDto;
 import com.example.Todo.dto.TodoResponseDto;
@@ -42,7 +42,7 @@ public class TodoServiceImpl implements TodoService {
         }
 
         if (isNotValidUserId(userId)) {
-            throw new CustomException(ErrorCode.TODO_FIND_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.TODO_FIND_BAD_REQUEST);
         }
 
         return todoRepository.findTodos(userId, pageable);
@@ -60,11 +60,11 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public TodoResponseDto updateTodo(Long id, String contents, Long userId, String name, String password) {
         if (contents == null && userId == null) {
-            throw new CustomException(ErrorCode.TODO_UPDATE_DATA_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.TODO_UPDATE_DATA_BAD_REQUEST);
         }
 
         if (isNotMatchPassword(id, password)) {
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+            throw new CustomExceptionHandler(ErrorCode.INVALID_PASSWORD);
         }
 
         int updatedRow = 0;
@@ -80,7 +80,7 @@ public class TodoServiceImpl implements TodoService {
         }
 
         if (updatedRow == 0) {
-            throw new CustomException(ErrorCode.TODO_UPDATE_ID_NOT_FOUND);
+            throw new CustomExceptionHandler(ErrorCode.TODO_UPDATE_ID_NOT_FOUND);
         }
 
         return new TodoResponseDto(todoRepository.findTodoById(id).get(), userRepository.findUserNameById(userId));
@@ -89,12 +89,12 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public void deleteTodo(Long id, String password) {
         if (isNotMatchPassword(id, password)) {
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+            throw new CustomExceptionHandler(ErrorCode.INVALID_PASSWORD);
         }
         int deleteRow = todoRepository.deleteTodo(id);
 
         if (deleteRow == 0) {
-            throw new CustomException(ErrorCode.TODO_UPDATE_ID_NOT_FOUND);
+            throw new CustomExceptionHandler(ErrorCode.TODO_UPDATE_ID_NOT_FOUND);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.example.Todo.controller;
 
-import com.example.Todo.Exception.CustomException;
+import com.example.Todo.Exception.CustomExceptionHandler;
 import com.example.Todo.Exception.ErrorCode;
 import com.example.Todo.dto.TodoRequestDto;
 import com.example.Todo.dto.TodoResponseDto;
@@ -38,7 +38,7 @@ public class TodoController {
     public ResponseEntity<TodoResponseDto> createTodo(@Valid @RequestBody TodoRequestDto requestDto,
                                                       BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new CustomException(ErrorCode.TODO_SAVE_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.TODO_SAVE_BAD_REQUEST);
         }
 
         return new ResponseEntity<>(todoService.saveTodo(requestDto), HttpStatus.OK);
@@ -65,7 +65,7 @@ public class TodoController {
                                                       @Valid @RequestBody TodoRequestDto requestDto,
                                                       BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new CustomException(ErrorCode.TODO_UPDATE_DATA_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.TODO_UPDATE_DATA_BAD_REQUEST);
         }
 
         return new ResponseEntity<>(
@@ -79,7 +79,7 @@ public class TodoController {
     public ResponseEntity<Void> deleteTodo(@PathVariable Long id,
                                            @Valid @RequestBody TodoRequestDto requestDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new CustomException(ErrorCode.TODO_DELETE_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.TODO_DELETE_BAD_REQUEST);
         }
 
         todoService.deleteTodo(id, requestDto.getPassword());

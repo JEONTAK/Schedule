@@ -190,7 +190,7 @@ ___
 
 ### Requirement
 
-** Schedule을 Todo로 일괄 변경**
+**Schedule을 Todo로 일괄 변경**
 
 - 작성자와 일정의 연결
     - 동명이인의 작성자가 있어 어떤 작성자가 등록한 `할 일` 인지 구별 할 수 없음
@@ -468,6 +468,7 @@ type(scope) : short summary
 ### type
 
 <br>feat: 새로운 기능 추가.
+<br>impl: 기능 수정.
 <br>fix: 버그 수정.
 <br>docs: 문서 수정 (README.md, 주석 등).
 <br>style: 코드 포맷팅, 세미콜론 누락 등 기능에 영향을 미치지 않는 변경.

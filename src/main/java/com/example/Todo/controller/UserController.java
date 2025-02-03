@@ -1,6 +1,6 @@
 package com.example.Todo.controller;
 
-import com.example.Todo.Exception.CustomException;
+import com.example.Todo.Exception.CustomExceptionHandler;
 import com.example.Todo.Exception.ErrorCode;
 import com.example.Todo.dto.UserRequestDto;
 import com.example.Todo.dto.UserResponseDto;
@@ -33,7 +33,7 @@ public class UserController {
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto requestDto,
                                                       BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new CustomException(ErrorCode.USER_SAVE_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.USER_SAVE_BAD_REQUEST);
         }
         return new ResponseEntity<>(userService.saveUser(requestDto), HttpStatus.OK);
     }
@@ -44,7 +44,7 @@ public class UserController {
                                                       @Valid @RequestBody UserRequestDto requestDto,
                                                       BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new CustomException(ErrorCode.USER_SAVE_BAD_REQUEST);
+            throw new CustomExceptionHandler(ErrorCode.USER_SAVE_BAD_REQUEST);
         }
         return new ResponseEntity<>(
                 userService.updateUser(id, requestDto.getName(), requestDto.getEmail()),
