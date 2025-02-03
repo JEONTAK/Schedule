@@ -1,5 +1,7 @@
 package com.example.Todo.service;
 
+import com.example.Todo.Exception.CustomException;
+import com.example.Todo.Exception.ErrorCode;
 import com.example.Todo.dto.TodoRequestDto;
 import com.example.Todo.dto.TodoResponseDto;
 import com.example.Todo.entity.Todo;
@@ -9,9 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class TodoServiceImpl implements TodoService {
@@ -26,6 +26,10 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public TodoResponseDto saveTodo(TodoRequestDto requestDto) {
+        if (isNullRequestDto(requestDto)) {
+            throw new CustomException(ErrorCode.TODO_SAVE_BAD_REQUEST);
+        }
+
         LocalDateTime createDate = LocalDateTime.now();
         Todo todo = new Todo(requestDto.getContents(), requestDto.getUserId(),
                 requestDto.getPassword(),
@@ -34,12 +38,26 @@ public class TodoServiceImpl implements TodoService {
         return todoRepository.saveTodo(todo);
     }
 
+    private boolean isNullRequestDto(TodoRequestDto requestDto) {
+        return requestDto.getContents() == null || requestDto.getName() == null || requestDto.getUserId() == null
+                || requestDto.getPassword() == null;
+    }
+
     @Override
     public Page<TodoResponseDto> findTodos(Long userId, Pageable pageable) {
         if (userId == null) {
             return todoRepository.findTodos(pageable);
         }
+
+        if (isNotValidUserId(userId)) {
+            throw new CustomException(ErrorCode.TODO_FIND_BAD_REQUEST);
+        }
+
         return todoRepository.findTodos(userId, pageable);
+    }
+
+    private boolean isNotValidUserId(Long userId) {
+        return todoRepository.findTodoById(userId).isEmpty();
     }
 
     @Override
@@ -50,11 +68,11 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public TodoResponseDto updateTodo(Long id, String contents, Long userId, String name, String password) {
         if (contents == null && userId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The title and content must be either of them.");
+            throw new CustomException(ErrorCode.TODO_UPDATE_DATA_BAD_REQUEST);
         }
 
         if (isNotMatchPassword(id, password)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Does not match password");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         int updatedRow = 0;
@@ -70,7 +88,7 @@ public class TodoServiceImpl implements TodoService {
         }
 
         if (updatedRow == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
+            throw new CustomException(ErrorCode.TODO_UPDATE_ID_NOT_FOUND);
         }
 
         return new TodoResponseDto(todoRepository.findTodoById(id).get(), userRepository.findUserNameById(userId));
@@ -79,12 +97,12 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public void deleteTodo(Long id, String password) {
         if (isNotMatchPassword(id, password)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Does not match password");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
         int deleteRow = todoRepository.deleteTodo(id);
 
         if (deleteRow == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
+            throw new CustomException(ErrorCode.TODO_UPDATE_ID_NOT_FOUND);
         }
     }
 
