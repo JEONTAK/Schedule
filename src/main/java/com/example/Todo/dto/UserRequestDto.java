@@ -10,7 +10,7 @@ public class UserRequestDto {
 
     private String name;
 
-    @Email(message = "이메일 형식이 아닙니다.")
+    @Email
     private String email;
 
     private String gender;

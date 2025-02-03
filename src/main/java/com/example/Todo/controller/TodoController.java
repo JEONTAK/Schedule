@@ -62,7 +62,8 @@ public class TodoController {
     @PutMapping("/todos/{id}")
     @Operation(description = "할일 수정")
     public ResponseEntity<TodoResponseDto> updateTodo(@PathVariable Long id,
-                                                      @Valid @RequestBody TodoRequestDto requestDto, BindingResult bindingResult) {
+                                                      @Valid @RequestBody TodoRequestDto requestDto,
+                                                      BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new CustomException(ErrorCode.TODO_UPDATE_DATA_BAD_REQUEST);
         }
