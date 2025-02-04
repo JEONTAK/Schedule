@@ -1,5 +1,7 @@
 package com.example.Todo.repository;
 
+import com.example.Todo.Exception.CustomExceptionHandler;
+import com.example.Todo.Exception.ErrorCode;
 import com.example.Todo.dto.TodoResponseDto;
 import com.example.Todo.entity.Todo;
 import java.sql.ResultSet;
@@ -12,13 +14,11 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.server.ResponseStatusException;
 
 @Repository
 public class TodoRepositoryImpl implements TodoRepository {
@@ -92,7 +92,7 @@ public class TodoRepositoryImpl implements TodoRepository {
         List<TodoResponseDto> result = jdbcTemplate.query("select * from todo where id = ?",
                 todoResponseDtoRowMapper(), id);
         return result.stream().findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
+                .orElseThrow(() -> new CustomExceptionHandler(ErrorCode.TODO_FIND_BAD_REQUEST));
     }
 
     @Override

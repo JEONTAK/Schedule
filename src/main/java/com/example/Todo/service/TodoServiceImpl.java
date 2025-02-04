@@ -67,9 +67,16 @@ public class TodoServiceImpl implements TodoService {
             throw new CustomExceptionHandler(ErrorCode.INVALID_PASSWORD);
         }
 
+        //updateRow = 0 : 업데이트 실패
+        //나머지 : 업데이트 성공
         int updatedRow = 0;
         LocalDateTime date = LocalDateTime.now();
 
+        /**
+         *   1. contents userId 들다 들어왔을 경우
+         *   2. userId 만 들어왔을 경우
+         *   3. contents만 들어왔을 경우
+         */
         if (contents != null && userId != null) {
             updatedRow = todoRepository.updateContents(id, contents, date);
             updatedRow += userRepository.updateUserName(userId, name, date);

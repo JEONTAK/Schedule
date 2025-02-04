@@ -52,6 +52,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public String findUserNameById(Long id) {
+        List<User> result = jdbcTemplate.query("select * from user where id = ?", userRowMapper(), id);
+        return result.get(0).getName();
+    }
+
+    @Override
     public int updateUser(Long id, String name, String email, LocalDateTime date) {
         return jdbcTemplate.update("update user set name = ?, email = ?, edit_date = ? where id = ?", name, email, date,
                 id);
@@ -70,12 +76,6 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public int deleteUser(Long id) {
         return jdbcTemplate.update("delete from user where id = ?", id);
-    }
-
-    @Override
-    public String findUserNameById(Long id) {
-        List<User> result = jdbcTemplate.query("select * from user where id = ?", userRowMapper(), id);
-        return result.get(0).getName();
     }
 
     private RowMapper<User> userRowMapper() {

@@ -41,10 +41,16 @@ public class UserServiceImpl implements UserService {
             throw new CustomExceptionHandler(ErrorCode.USER_UPDATE_DATA_BAD_REQUEST);
         }
 
+        //updateRow = 0 : 업데이트 실패
+        //나머지 : 업데이트 성공
+        int updatedRow = 0;
         LocalDateTime date = LocalDateTime.now();
 
-        int updatedRow = 0;
-
+        /**
+         *   1. name email 들다 들어왔을 경우
+         *   2. name 만 들어왔을 경우
+         *   3. email만 들어왔을 경우
+         */
         if (name != null && email != null) {
             updatedRow = userRepository.updateUser(id, name, email, date);
         } else if (name != null) {

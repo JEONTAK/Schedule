@@ -88,6 +88,7 @@ public class TodoController {
 
 
     @PostMapping("/todos/init")
+    @Operation(description = "할일 100개 삽입")
     public void initialTodos() {
         for (int i = 0; i < 100; i++) {
             String content = "Hello" + (i + 1);

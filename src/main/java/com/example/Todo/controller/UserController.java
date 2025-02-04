@@ -60,6 +60,7 @@ public class UserController {
 
 
     @PostMapping("/users/init")
+    @Operation(description = "유저 100명 삽입")
     public void initialUser() {
         for (int i = 0; i < 100; i++) {
             String name = "User" + (i + 1);

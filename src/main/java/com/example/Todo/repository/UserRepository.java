@@ -13,6 +13,8 @@ public interface UserRepository {
 
     Optional<User> findUserById(Long id);
 
+    String findUserNameById(Long userId);
+
     int updateUser(Long id, String name, String email, LocalDateTime date);
 
     int updateUserName(Long id, String name, LocalDateTime date);
@@ -21,5 +23,5 @@ public interface UserRepository {
 
     int deleteUser(Long id);
 
-    String findUserNameById(Long userId);
+
 }
